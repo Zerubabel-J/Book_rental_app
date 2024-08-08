@@ -47,6 +47,46 @@ class UserService {
     }
     return user;
   }
+
+  // New method to update user information
+  static async updateUserProfile(id, updates) {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (updates.password) {
+      updates.password_hash = await bcrypt.hash(updates.password, 10);
+      delete updates.password;
+    }
+
+    const updatedUser = await User.updateUser(id, updates);
+    return updatedUser;
+  }
+
+  // New method to get all users (for admin purposes)
+  static async getAllUsers() {
+    const users = await User.findAllUsers();
+    return users;
+  }
+  static async approveUser(id) {
+    const user = await User.approveUser(id);
+    return user;
+  }
+  static async rejectUser(id) {
+    const user = await User.rejectUser(id);
+    return user;
+  }
+
+  static async deleteUser(id) {
+    const userExist = await UserService.getUserProfile(id);
+
+    if (!userExist) {
+      return res.status(404).json({ message: `User with id ${id} not found.` });
+    }
+    const user = await User.deleteUser(id);
+    return user;
+  }
 }
 
 module.exports = UserService;
