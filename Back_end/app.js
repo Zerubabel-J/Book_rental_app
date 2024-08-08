@@ -1,9 +1,9 @@
-// app.js
 const express = require("express");
 const dotenv = require("dotenv");
 const userRoutes = require("./routes/userRoutes");
 const bookRoutes = require("./routes/bookRoutes");
 const { errorHandler } = require("./middlewares/errorHandler");
+const { authenticateJWT } = require("./middlewares/authenticateJWT");
 
 dotenv.config();
 
@@ -12,10 +12,11 @@ app.use(express.json()); // Middleware to parse JSON requests
 
 // Routes
 app.use("/api/users", userRoutes); // User-related routes
-app.use("/api/books", bookRoutes); // Book-related routes
+app.use("/api/books", authenticateJWT, bookRoutes); // Book-related routes (protected)
 
+// Default route
 app.get("/", (req, res) => {
-  res.send("Hello, Greetings!"); // Default route
+  res.send("Hello, Greetings!");
 });
 
 // Error handling middleware

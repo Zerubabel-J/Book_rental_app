@@ -1,4 +1,3 @@
-// models/userModel.js
 const pool = require("../config/db");
 
 class User {
@@ -21,8 +20,6 @@ class User {
     const res = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
     return res.rows[0];
   }
-
-  // Other user-related database operations...
 }
 
 module.exports = User;
