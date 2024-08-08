@@ -21,14 +21,15 @@ router.get("/", authenticateJWT, UserController.getAllUsers);
 
 router.patch(
   "/approve/:id",
+
   authenticateJWT,
-  authorize("manage", "User"),
+  authorize("manage", "all"),
   UserController.approveUser
 );
 router.patch(
   "/reject/:id",
   authenticateJWT,
-  authorize("manage", "User"),
+  authorize("manage", "all"),
   UserController.rejectUser
 );
 router.delete(

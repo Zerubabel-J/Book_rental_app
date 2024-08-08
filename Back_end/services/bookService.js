@@ -2,44 +2,36 @@
 const Book = require("../models/bookModel");
 
 class BookService {
-  static async addBook({
-    title,
-    author,
-    category_id,
-    isbn,
-    description,
-    price_per_day,
-    owner_id,
-    quantity,
-    available,
-    approved,
-  }) {
-    const newBook = await Book.createBook({
-      title,
-      author,
-      category_id,
-      isbn,
-      description,
-      price_per_day,
-      owner_id,
-      quantity,
-      available,
-      approved,
-    });
-    return newBook;
+  static async createBook(bookData) {
+    return await Book.createBook(bookData);
+  }
+
+  static async updateBook(id, bookData) {
+    return await Book.updateBook(id, bookData);
+  }
+
+  static async deleteBook(id) {
+    return await Book.deleteBook(id);
+  }
+
+  static async getBooksByOwner(ownerId) {
+    return await Book.getBooksByOwner(ownerId);
   }
 
   static async getAllBooks() {
-    const books = await Book.findAll();
-    return books;
+    return await Book.getAllBooks();
   }
 
-  static async getBookById(id) {
-    const book = await Book.findById(id);
-    if (!book) {
-      throw new Error("Book not found");
-    }
-    return book;
+  static async updateBookAvailability(id, availability) {
+    return await Book.updateBookAvailability(id, availability);
+  }
+
+  static async approveBook(id) {
+    return await Book.approveBook(id);
+  }
+
+  static async rejectBook(id) {
+    return await Book.rejectBook(id);
   }
 }
 
