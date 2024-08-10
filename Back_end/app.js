@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const userRoutes = require("./routes/userRoutes");
 const bookRoutes = require("./routes/bookRoutes");
+const rentalRoutes = require("./routes/rentalRoute");
 const { errorHandler } = require("./middlewares/errorHandler");
 const { authenticateJWT } = require("./middlewares/authenticateJWT");
 
@@ -13,6 +14,7 @@ app.use(express.json()); // Middleware to parse JSON requests
 // Routes
 app.use("/api/users", userRoutes); // User-related routes
 app.use("/api/books", authenticateJWT, bookRoutes); // Book-related routes (protected)
+app.use("/api/rent", rentalRoutes); // User-related routes
 
 // Default route
 app.get("/", (req, res) => {
