@@ -17,13 +17,19 @@ class BookService {
   static async getBooksByOwner(ownerId) {
     return await Book.getBooksByOwner(ownerId);
   }
+  static async getBookById(book_id) {
+    return await Book.getBookById(book_id);
+  }
 
   static async getAllBooks() {
     return await Book.getAllBooks();
   }
+  static async getAvailableBooks() {
+    return await Book.getAvailableBooks();
+  }
 
-  static async updateBookAvailability(id, availability) {
-    return await Book.updateBookAvailability(id, availability);
+  static async updateBookAvailability(id) {
+    return await Book.updateBookAvailability(id);
   }
 
   static async approveBook(id) {

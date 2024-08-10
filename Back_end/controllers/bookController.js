@@ -39,6 +39,14 @@ class BookController {
       next(error);
     }
   }
+  static async getBookById(req, res, next) {
+    try {
+      const books = await BookService.getBookById(req.params.book_id);
+      res.status(200).json(books);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   static async getAllBooks(req, res, next) {
     try {
@@ -48,13 +56,18 @@ class BookController {
       next(error);
     }
   }
+  static async getAvailableBooks(req, res, next) {
+    try {
+      const books = await BookService.getAvailableBooks();
+      res.status(200).json(books);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   static async changeBookAvailability(req, res, next) {
     try {
-      const book = await BookService.updateBookAvailability(
-        req.params.id,
-        req.body.available
-      );
+      const book = await BookService.updateBookAvailability(req.params.id);
       res.status(200).json(book);
     } catch (error) {
       next(error);

@@ -80,23 +80,50 @@ class Book {
   }
 
   static async getAllBooks() {
-    const res = await pool.query(
-      "SELECT * FROM books WHERE approved = true AND available = true"
-    );
+    const res = await pool.query("SELECT * FROM books");
+    return res.rows;
+  }
+  static async getAvailableBooks() {
+    const res = await pool.query("SELECT * FROM books WHERE available=$1", [
+      true,
+    ]);
+    return res.rows;
+  }
+  static async getBookById(book_id) {
+    const res = await pool.query("SELECT * FROM books WHERE id=$1", [book_id]);
     return res.rows;
   }
 
-  static async updateBookAvailability(id, availability) {
-    const res = await pool.query(
-      "UPDATE books SET available = $1 WHERE id = $2 RETURNING *",
-      [availability, id]
-    );
-    return res.rows[0];
+  static async updateBookAvailability(id) {
+    try {
+      // Fetch the book by ID
+      const bookRes = await pool.query("SELECT * FROM books WHERE id=$1", [id]);
+
+      if (bookRes.rows.length === 0) {
+        throw new Error("Book not found");
+      }
+
+      const book = bookRes.rows[0];
+
+      // Determine if the book should be available
+      const isAvailable = book.approved && book.quantity > 0;
+      console.log(isAvailable);
+      // Update the book's availability status
+      const updateRes = await pool.query(
+        "UPDATE books SET available = $1 WHERE id = $2 RETURNING *",
+        [isAvailable, id]
+      );
+
+      return updateRes.rows[0];
+    } catch (error) {
+      console.error("Error updating book availability:", error);
+      throw error;
+    }
   }
 
   static async approveBook(id) {
     const res = await pool.query(
-      "UPDATE books SET approved = true, available=true WHERE id = $1 RETURNING *",
+      "UPDATE books SET approved = true WHERE id = $1 RETURNING *",
       [id]
     );
     // console.log(res.rows[0]);

@@ -6,6 +6,10 @@ const { authorize, adminOnly } = require("../middlewares/authorize");
 const validateBook = require("../validators/validateBook");
 const router = express.Router();
 
+// Public routes
+router.get("/", BookController.getAllBooks);
+router.get("/available", BookController.getAvailableBooks);
+
 // Owner routes
 router.post(
   "/",
@@ -33,6 +37,12 @@ router.get(
   authorize("manage", "Book"),
   BookController.getBooksByOwner
 );
+router.get(
+  "/:book_id",
+  authenticateJWT,
+  authorize("manage", "Book"),
+  BookController.getBookById
+);
 
 // // Admin routes
 
@@ -43,6 +53,13 @@ router.patch(
   authorize("manage", "Book"),
   BookController.approveBook
 );
+router.patch(
+  "/available/:id",
+  authenticateJWT,
+  adminOnly,
+  authorize("manage", "Book"),
+  BookController.changeBookAvailability
+);
 
 router.patch(
   "/reject/:id",
@@ -51,8 +68,5 @@ router.patch(
   authorize("manage", "Book"),
   BookController.rejectBook
 );
-
-// Public routes
-router.get("/", BookController.getAllBooks);
 
 module.exports = router;
