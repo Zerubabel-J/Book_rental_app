@@ -1,126 +1,97 @@
-import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from "@mui/material";
-import { z, ZodError } from "zod";
-import axios from "axios";
+import React from "react";
+import { TextField, Button, Box, Container, Typography } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { signup } from "../services/auth"; // Import the signup function
 
-// Zod schema for validation
-const schema = z.object({
+// Define the schema using Zod
+const signupSchema = z.object({
   username: z.string().min(1, "Username is required"),
-  email: z.string().email("Invalid email address"),
+  email: z.string().min(1, "Email is required").email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["customer", "owner", "admin"], "Role is required"),
+  role: z.string().min(1, "Role is required"),
 });
 
-const Signup = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    role: "customer",
+const SignupForm = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(signupSchema),
   });
-  const [errors, setErrors] = useState({});
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     try {
-      schema.parse(formData); // Validate form data
-      await axios.post("/api/signup", formData); // API call
-      // Handle success (e.g., redirect)
+      // Call the signup function from the auth service
+      const result = await signup(
+        data.username,
+        data.email,
+        data.password,
+        data.role
+      );
+      console.log("Signup successful:", result);
+      // Handle successful signup (e.g., redirect user or show a success message)
     } catch (error) {
-      if (error instanceof ZodError) {
-        // Set validation errors
-        const validationErrors = error.errors.reduce((acc, err) => {
-          acc[err.path[0]] = err.message;
-          return acc;
-        }, {});
-        setErrors(validationErrors);
-      } else {
-        console.error("Signup failed:", error);
-        // Handle other errors
-      }
+      console.error("Signup failed:", error.message);
+      // Handle signup failure (e.g., show error message to user)
     }
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "auto", padding: 20 }}>
-      <Typography variant="h4" gutterBottom>
-        Sign Up
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          name="username"
-          label="Username"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={formData.username}
-          onChange={handleChange}
-          error={!!errors.username}
-          helperText={errors.username}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          name="email"
-          label="Email"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={formData.email}
-          onChange={handleChange}
-          error={!!errors.email}
-          helperText={errors.email}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          name="password"
-          label="Password"
-          type="password"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={formData.password}
-          onChange={handleChange}
-          error={!!errors.password}
-          helperText={errors.password}
-          sx={{ mb: 2 }}
-        />
-        <FormControl fullWidth margin="normal" sx={{ mb: 2 }}>
-          <InputLabel>Role</InputLabel>
-          <Select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            error={!!errors.role}
-          >
-            <MenuItem value="customer">Customer</MenuItem>
-            <MenuItem value="owner">Owner</MenuItem>
-            <MenuItem value="admin">Admin</MenuItem>
-          </Select>
-          {errors.role && (
-            <Typography color="error" variant="body2">
-              {errors.role}
-            </Typography>
-          )}
-        </FormControl>
-        <Button type="submit" variant="contained" color="primary" fullWidth>
+    <Container maxWidth="sm">
+      <Box sx={{ mt: 8 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
           Sign Up
-        </Button>
-      </form>
-    </div>
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2 }}>
+          <TextField
+            fullWidth
+            label="Username"
+            margin="normal"
+            {...register("username")}
+            error={!!errors.username}
+            helperText={errors.username ? errors.username.message : ""}
+          />
+          <TextField
+            fullWidth
+            label="Email"
+            margin="normal"
+            {...register("email")}
+            error={!!errors.email}
+            helperText={errors.email ? errors.email.message : ""}
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            type="password"
+            margin="normal"
+            {...register("password")}
+            error={!!errors.password}
+            helperText={errors.password ? errors.password.message : ""}
+          />
+          <TextField
+            fullWidth
+            label="Role"
+            margin="normal"
+            {...register("role")}
+            error={!!errors.role}
+            helperText={errors.role ? errors.role.message : ""}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            fullWidth
+            sx={{ mt: 3 }}
+          >
+            Sign Up
+          </Button>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 
-export default Signup;
+export default SignupForm;

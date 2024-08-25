@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
 const bookRoutes = require("./routes/bookRoutes");
 const rentalRoutes = require("./routes/rentalRoute");
@@ -9,6 +10,8 @@ const { authenticateJWT } = require("./middlewares/authenticateJWT");
 dotenv.config();
 
 const app = express();
+// Use CORS middleware
+app.use(cors());
 app.use(express.json()); // Middleware to parse JSON requests
 
 // Routes

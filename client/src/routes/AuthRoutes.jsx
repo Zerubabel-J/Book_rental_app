@@ -6,7 +6,6 @@ import SignupForm from "../components/SignupForm";
 const AuthRoutes = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
-    {/* Uncomment and add SignupPage once it's ready */}
     <Route path="/signup" element={<SignupForm />} />
   </Routes>
 );
