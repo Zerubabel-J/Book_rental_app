@@ -1,9 +1,23 @@
-import React from "react";
-import { TextField, Button, Box, Container, Typography } from "@mui/material";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
+import {
+  TextField,
+  Button,
+  Box,
+  Container,
+  Typography,
+  Alert,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  FormHelperText,
+} from "@mui/material";
+
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { signup } from "../services/auth"; // Import the signup function
+import { useNavigate } from "react-router-dom";
 
 // Define the schema using Zod
 const signupSchema = z.object({
@@ -14,9 +28,13 @@ const signupSchema = z.object({
 });
 
 const SignupForm = () => {
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(signupSchema),
@@ -32,10 +50,17 @@ const SignupForm = () => {
         data.role
       );
       console.log("Signup successful:", result);
-      // Handle successful signup (e.g., redirect user or show a success message)
+      setSuccessMessage("Signup successful! Redirecting to login...");
+      setErrorMessage(result.message);
+      setTimeout(() => {
+        navigate("/login"); // Redirect to login after 2 seconds
+      }, 2000);
     } catch (error) {
       console.error("Signup failed:", error.message);
-      // Handle signup failure (e.g., show error message to user)
+      setErrorMessage(
+        error.response?.data?.message || "Signup failed, please try again."
+      );
+      setSuccessMessage("");
     }
   };
 
@@ -45,12 +70,14 @@ const SignupForm = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           Sign Up
         </Typography>
+        {successMessage && <Alert severity="success">{successMessage}</Alert>}
+        {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
         <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2 }}>
           <TextField
             fullWidth
             label="Username"
             margin="normal"
-            {...register("username")}
+            {...register("username", { required: "Username is required" })}
             error={!!errors.username}
             helperText={errors.username ? errors.username.message : ""}
           />
@@ -58,7 +85,7 @@ const SignupForm = () => {
             fullWidth
             label="Email"
             margin="normal"
-            {...register("email")}
+            {...register("email", { required: "Email is required" })}
             error={!!errors.email}
             helperText={errors.email ? errors.email.message : ""}
           />
@@ -67,18 +94,29 @@ const SignupForm = () => {
             label="Password"
             type="password"
             margin="normal"
-            {...register("password")}
+            {...register("password", { required: "Password is required" })}
             error={!!errors.password}
             helperText={errors.password ? errors.password.message : ""}
           />
-          <TextField
-            fullWidth
-            label="Role"
-            margin="normal"
-            {...register("role")}
-            error={!!errors.role}
-            helperText={errors.role ? errors.role.message : ""}
-          />
+
+          <FormControl fullWidth margin="normal" error={!!errors.role}>
+            <InputLabel>Role</InputLabel>
+            <Controller
+              name="role"
+              control={control}
+              defaultValue="" // Set a default value
+              rules={{ required: "Role is required" }}
+              render={({ field }) => (
+                <Select {...field} label="Role">
+                  <MenuItem value="admin">Admin</MenuItem>
+                  <MenuItem value="owner">Owner</MenuItem>
+                  <MenuItem value="customer">Customer</MenuItem>
+                </Select>
+              )}
+            />
+            <FormHelperText>{errors.role?.message}</FormHelperText>
+          </FormControl>
+
           <Button
             variant="contained"
             color="primary"

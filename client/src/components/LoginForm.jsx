@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Link } from "react-router-dom";
 import { login } from "../services/auth";
+import { convertLength } from "@mui/material/styles/cssUtils";
 // Define the schema using Zod
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -24,6 +25,7 @@ const LoginForm = () => {
     try {
       // Call the login function from the auth service
       const result = await login(data.email, data.password);
+      localStorage.setItem("authToken", result.token); // Save token
       console.log("Login successful:", result);
       // Handle successful login (e.g., redirect user or store token)
     } catch (error) {

@@ -15,6 +15,7 @@
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@hookform/resolvers": "^3.9.0",
+    "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
     "@tanstack/react-table": "^8.20.1",
     "axios": "^1.7.5",

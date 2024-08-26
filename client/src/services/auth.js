@@ -20,6 +20,7 @@ export const login = async (email, password) => {
 
 // Function to handle signup
 export const signup = async (username, email, password, role) => {
+  console.log(username, email, password, role);
   try {
     const response = await axios.post(`${API_URL}/register`, {
       username,
